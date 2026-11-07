@@ -20,7 +20,10 @@ that runs this fork runs a tag of this branch: `v0.28.0-bk.1`, `v0.28.0-bk.2`, a
 
 1. Make `bk/<new tag>` from the upstream tag, and push it.
 2. Cherry-pick the queue onto it, in order, on a branch: for each row of the table, the merged commit of its pull
-   request in this fork. Fix the conflicts there. Drop each patch that upstream now ships, and say so in this file.
+   request in this fork. For a merge commit, run `git cherry-pick -m 1 <merge commit>`: parent 1 is the `bk/` branch
+   before the merge, so the patch is the PR's whole change. For a squash or rebase merge, run
+   `git cherry-pick <commit>` for each commit it made. Fix the conflicts there. Drop each patch that upstream now
+   ships, and say so in this file.
 3. In this file, change the branch name, the upstream tag and the example fork tags at the top to the new ones.
 4. Run `npm ci`, `npm run check`, `npm run lint` and `npm test`.
 5. Open a pull request into `bk/<new tag>`. After its review and merge, tag `<new tag>-bk.1`.

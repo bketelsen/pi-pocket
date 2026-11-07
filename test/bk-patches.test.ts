@@ -1,5 +1,6 @@
-// The fork's patch queue (`BK-PATCHES.md`): each row names the fork PR whose merged commit moves, the tag form has one
-// `v`, and the publish triggers it names are the ones `publish.yml` has. Fork only: it moves with the queue.
+// The fork's patch queue (`BK-PATCHES.md`): each row names the fork PR whose merged commit moves, a merge commit moves
+// with `-m 1`, the tag form has one `v`, and the publish triggers it names are the ones `publish.yml` has. Fork only: it
+// moves with the queue.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -46,6 +47,12 @@ test("each patch in the queue names its fork PR", () => {
 test("a fork tag is the upstream tag with -bk.<n>, never a second v", () => {
     assert.doesNotMatch(patches, /`v<[^>]*tag>/);
     assert.match(patches, /`<new tag>-bk\.1`/);
+});
+
+test("a move cherry-picks a merge commit with its first parent, and a squash commit as it is", () => {
+    assert.match(patches, /`git cherry-pick -m 1 <merge commit>`/);
+    assert.match(patches, /parent 1 is the `bk\/` branch/);
+    assert.match(patches, /`git cherry-pick <commit>`/);
 });
 
 test("the publish triggers named are the ones publish.yml has", () => {
