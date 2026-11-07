@@ -98,3 +98,9 @@ Each member in the reference has its own Since line. These parts came together:
 | Presented inputs: `web.presentEntry` and `pocket.entryPresentation` (experimental)                                                                                | 0.28.0 |
 | Fenced blocks and inline math: `pocket.fence` and `pocket.mathInline` (experimental)                                                                              | 0.28.0 |
 | `answers` from `linkedSessions.send` (experimental)                                                                                                               | 0.28.0 |
+
+The fork bketelsen/pi-pocket adds parts on its `bk/<tag>` branches, listed in its `BK-PATCHES.md`. Its tags have the upstream version with `-bk.<n>`, and `host.pocketVersion` and `pocket.version` give the upstream version: check for each part itself.
+
+| Part (fork only)                                                          | Since       |
+| ------------------------------------------------------------------------- | ----------- |
+| `linkedSessions.reports`: a lead turns off run-end answers (experimental) | 0.28.0-bk.1 |
