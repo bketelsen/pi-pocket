@@ -32,7 +32,8 @@ that runs this fork runs a tag of this branch: `v0.28.1-bk.1`, `v0.28.1-bk.2`, a
    runs: the server loads its code and `node_modules` from there, and `npm ci` first removes `node_modules`. Prepare
    the tag in a separate worktree (`git worktree add --detach <folder> <new tag>-bk.<n>`), run `npm ci` there, and
    check that it loads: `npm ls --omit=dev` passes, and `node test/serve.ts 8898 127.0.0.2` answers on
-   `http://127.0.0.2:8898/`. Then stop the server, switch it to the prepared tag, and start it.
+   `http://127.0.0.2:8898/`. Then stop the server, switch it to the prepared tag, and start it, as 1 command
+   chained with `&&`: when the stop fails, the switch and the start must not run.
 
 ## The queue
 

@@ -69,6 +69,10 @@ test("a move switches the server from an SSH shell, to a tag prepared in a separ
     assert.match(move, /Prepare\s+the tag in a separate worktree/);
     assert.match(move, /`npm ls --omit=dev` passes/);
     assert.match(move, /Then stop the server, switch it to the prepared tag, and start it/);
+    assert.match(
+        move,
+        /chained with `&&`: when the stop fails, the switch and the start must not run/,
+    );
 });
 
 test("the publish triggers named are the ones publish.yml has", () => {
