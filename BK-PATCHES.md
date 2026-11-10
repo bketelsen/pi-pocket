@@ -27,9 +27,13 @@ that runs this fork runs a tag of this branch: `v0.28.1-bk.1`, `v0.28.1-bk.2`, a
 3. In this file, change the branch name, the upstream tag and the example fork tags at the top to the new ones.
 4. Run `npm ci`, `npm run check`, `npm run lint` and `npm test`.
 5. Open a pull request into `bk/<new tag>`. After its review and merge, tag `<new tag>-bk.1`.
-6. Before the server restarts on the new fork tag: in the server's checkout, run `npm ci` and wait until it ends,
-   then check that the runtime dependencies are installed with `npm ls --omit=dev` (it fails when one is missing).
-   `npm ci` first removes `node_modules`, so a restart before it ends fails with `ERR_MODULE_NOT_FOUND`.
+6. Move the server to the new fork tag from an SSH shell on the host, never from inside Pi Pocket (its Terminal, an
+   agent, or Menu → Update Pi Pocket). Never run `npm ci` or `git checkout` in the live checkout while the server
+   runs: the server loads its code and `node_modules` from there, and `npm ci` first removes `node_modules`. Prepare
+   the tag in a separate worktree (`git worktree add --detach <folder> <new tag>-bk.<n>`), run `npm ci` there, and
+   check that it loads: `npm ls --omit=dev` passes, and `node test/serve.ts 8898 127.0.0.2` answers on
+   `http://127.0.0.2:8898/`. Then stop the server, switch it to the prepared tag, and start it, as 1 command
+   chained with `&&`: when the stop fails, the switch and the start must not run.
 
 ## The queue
 
