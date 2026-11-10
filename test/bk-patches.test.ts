@@ -72,7 +72,18 @@ test("a move switches the server from an SSH shell, to a tag prepared in a separ
     says(
         "The drop-ins' links `~/.pi-pocket/extensions/node_modules` and `_pocket.d.ts` point through `pi-pocket-live`",
     );
-    says("Never run `npm ci` or `git checkout` in the release folder that the server runs");
+    says(
+        "Never run `npm ci` or `git checkout` in the folder that `pi-pocket-live` names (`readlink -f ~/projects/pi-pocket-live`) while the server runs",
+    );
+    // Before the first switch the link names the main checkout, so the main checkout is live until then.
+    says(
+        "Until the first switch to a release folder, `pi-pocket-live` names the main checkout itself",
+    );
+    says("Only after the first switch does the main checkout hold no live code");
+    assert.ok(!move.includes("The main checkout holds no live code"), "no unconditional claim");
+    says(
+        "in a worktree of the branch of step 2, never in the folder that `pi-pocket-live` names (step 6)",
+    );
 
     // Prepare while the server runs, and check that the folder loads.
     says(
@@ -89,7 +100,10 @@ test("a move switches the server from an SSH shell, to a tag prepared in a separ
         "stops the server, points `pi-pocket-live` at the prepared release folder, and starts the server",
     );
     says("chained with `&&`: when the stop fails, the switch and the start must not run");
-    says("Roll back with the same command and the previous fork tag");
+    says("Roll back with the command that `activate` prints");
+    says("same `activate` with the previous fork tag");
+    says("After the first switch, it points `pi-pocket-live` back at the main checkout");
+    says("only after the next release runs well, and never the folder that `pi-pocket-live` names");
 });
 
 test("the publish triggers named are the ones publish.yml has", () => {
