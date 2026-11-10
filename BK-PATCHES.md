@@ -27,13 +27,26 @@ that runs this fork runs a tag of this branch: `v0.28.1-bk.1`, `v0.28.1-bk.2`, a
 3. In this file, change the branch name, the upstream tag and the example fork tags at the top to the new ones.
 4. Run `npm ci`, `npm run check`, `npm run lint` and `npm test`.
 5. Open a pull request into `bk/<new tag>`. After its review and merge, tag `<new tag>-bk.1`.
-6. Move the server to the new fork tag from an SSH shell on the host, never from inside Pi Pocket (its Terminal, an
-   agent, or Menu → Update Pi Pocket). Never run `npm ci` or `git checkout` in the live checkout while the server
-   runs: the server loads its code and `node_modules` from there, and `npm ci` first removes `node_modules`. Prepare
-   the tag in a separate worktree (`git worktree add --detach <folder> <new tag>-bk.<n>`), run `npm ci` there, and
-   check that it loads: `npm ls --omit=dev` passes, and `node test/serve.ts 8898 127.0.0.2` answers on
-   `http://127.0.0.2:8898/`. Then stop the server, switch it to the prepared tag, and start it, as 1 command
-   chained with `&&`: when the stop fails, the switch and the start must not run.
+6. Move the server to the new fork tag in 2 parts: prepare its release folder, then activate it. The server runs the
+   symlink `~/projects/pi-pocket-live`, and that link names 1 release folder
+   `~/projects/pi-pocket-releases/<fork tag>`: a detached worktree of the main checkout `~/projects/pi-pocket`, with
+   its own `node_modules`. The drop-ins' links `~/.pi-pocket/extensions/node_modules` and `_pocket.d.ts` point
+   through `pi-pocket-live` too. Never run `npm ci` or `git checkout` in the release folder that the server runs:
+   the server loads its code and `node_modules` from there, and `npm ci` first removes `node_modules`. The main
+   checkout holds no live code. The helper `pocket-switch` does both parts; the host's configuration installs it
+   (bketelsen/fleet, role `team_vm`, `docs/team-vm.md`, section "Pocket releases").
+    - Prepare, as the server's user, while the server runs: `pocket-switch prepare <new tag>-bk.<n>`. It fetches the
+      tag, makes the release folder (`git worktree add --detach`), runs `npm ci` there, and checks that it loads:
+      `npm ls --omit=dev` passes, and `node test/serve.ts 8898 127.0.0.2` answers on `http://127.0.0.2:8898/`
+      (`pocket-switch check <new tag>-bk.<n>` runs this check again). It never touches the folder that
+      `pi-pocket-live` names.
+    - Activate from an SSH shell on the host, never from inside Pi Pocket (its Terminal, an agent, or Menu → Update Pi
+      Pocket): `sudo pocket-switch activate <new tag>-bk.<n>`. It checks the release folder again, then stops the
+      server, points `pi-pocket-live` at the prepared release folder, and starts the server, as 1 command chained
+      with `&&`: when the stop fails, the switch and the start must not run. It prints the rollback command.
+    - Roll back with the same command and the previous fork tag. Remove an old release folder
+      (`git worktree remove`) only after the next release runs well, and never the folder that `pi-pocket-live`
+      names.
 
 ## The queue
 
