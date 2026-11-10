@@ -1,5 +1,6 @@
 // The fork's patch queue (`BK-PATCHES.md`): each row names the fork PR whose merged commit moves, a merge commit moves
-// with `-m 1`, the tag form has one `v`, a move switches the server from an SSH shell to a prepared tag, and the
+// with `-m 1`, the tag form has one `v`, a move prepares a release folder and switches the server's link to it from
+// an SSH shell, and the
 // publish triggers it names are the ones `publish.yml` has. Fork only: it moves with the queue.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -56,23 +57,53 @@ test("a move cherry-picks a merge commit with its first parent, and a squash com
 });
 
 test("a move switches the server from an SSH shell, to a tag prepared in a separate worktree", () => {
-    const move = patches.slice(
-        patches.indexOf("## Move to a new upstream release"),
-        patches.indexOf("## The queue"),
+    // Line breaks fall anywhere in the prose: compare with each run of white space as 1 space.
+    const move = patches
+        .slice(
+            patches.indexOf("## Move to a new upstream release"),
+            patches.indexOf("## The queue"),
+        )
+        .replace(/\s+/g, " ");
+    const says = (phrase: string) => assert.ok(move.includes(phrase), `step 6 says: ${phrase}`);
+
+    // The server runs 1 symlink; each fork tag has its own release folder, a separate worktree.
+    says("The server runs the symlink `~/projects/pi-pocket-live`");
+    says("`~/projects/pi-pocket-releases/<fork tag>`: a detached worktree of the main checkout");
+    says(
+        "The drop-ins' links `~/.pi-pocket/extensions/node_modules` and `_pocket.d.ts` point through `pi-pocket-live`",
+    );
+    says(
+        "Never run `npm ci` or `git checkout` in the folder that `pi-pocket-live` names (`readlink -f ~/projects/pi-pocket-live`) while the server runs",
+    );
+    // Before the first switch the link names the main checkout, so the main checkout is live until then.
+    says(
+        "Until the first switch to a release folder, `pi-pocket-live` names the main checkout itself",
+    );
+    says("Only after the first switch does the main checkout hold no live code");
+    assert.ok(!move.includes("The main checkout holds no live code"), "no unconditional claim");
+    says(
+        "in a worktree of the branch of step 2, never in the folder that `pi-pocket-live` names (step 6)",
     );
 
-    assert.match(move, /from an SSH shell on the host, never from inside Pi Pocket/);
-    assert.match(
-        move,
-        /Never run `npm ci` or `git checkout` in the live checkout while the server\s+runs/,
+    // Prepare while the server runs, and check that the folder loads.
+    says(
+        "Prepare, as the server's user, while the server runs: `pocket-switch prepare <new tag>-bk.<n>`",
     );
-    assert.match(move, /Prepare\s+the tag in a separate worktree/);
-    assert.match(move, /`npm ls --omit=dev` passes/);
-    assert.match(move, /Then stop the server, switch it to the prepared tag, and start it/);
-    assert.match(
-        move,
-        /chained with `&&`: when the stop fails, the switch and the start must not run/,
+    says("`npm ls --omit=dev` passes");
+    says("`node test/serve.ts 8898 127.0.0.2` answers");
+    says("It never touches the folder that `pi-pocket-live` names");
+
+    // Activate from an SSH shell, as 1 chain; roll back the same way.
+    says("Activate from an SSH shell on the host, never from inside Pi Pocket");
+    says("`sudo pocket-switch activate <new tag>-bk.<n>`");
+    says(
+        "stops the server, points `pi-pocket-live` at the prepared release folder, and starts the server",
     );
+    says("chained with `&&`: when the stop fails, the switch and the start must not run");
+    says("Roll back with the command that `activate` prints");
+    says("same `activate` with the previous fork tag");
+    says("After the first switch, it points `pi-pocket-live` back at the main checkout");
+    says("only after the next release runs well, and never the folder that `pi-pocket-live` names");
 });
 
 test("the publish triggers named are the ones publish.yml has", () => {
