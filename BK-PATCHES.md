@@ -1,8 +1,8 @@
 # Patches on this branch
 
-This branch, `bk/v0.28.0`, is the upstream release tag `v0.28.0` of
+This branch, `bk/v0.28.1`, is the upstream release tag `v0.28.1` of
 [TannerMidd/pi-pocket](https://github.com/TannerMidd/pi-pocket) with a short queue of patches on top. A server
-that runs this fork runs a tag of this branch: `v0.28.0-bk.1`, `v0.28.0-bk.2`, and so on.
+that runs this fork runs a tag of this branch: `v0.28.1-bk.1`, `v0.28.1-bk.2`, and so on.
 
 ## How the fork works
 
