@@ -28,8 +28,8 @@ that runs this fork runs a tag of this branch: `v0.28.1-bk.1`, `v0.28.1-bk.2`, a
 4. Run `npm ci`, `npm run check`, `npm run lint` and `npm test`.
 5. Open a pull request into `bk/<new tag>`. After its review and merge, tag `<new tag>-bk.1`.
 6. Before the server restarts on the new fork tag: in the server's checkout, run `npm ci` and wait until it ends,
-   then check the imports with `npm ls --omit=dev` (it fails when a dependency is missing). `npm ci` first removes
-   `node_modules`, so a restart before it ends fails with `ERR_MODULE_NOT_FOUND`.
+   then check that the runtime dependencies are installed with `npm ls --omit=dev` (it fails when one is missing).
+   `npm ci` first removes `node_modules`, so a restart before it ends fails with `ERR_MODULE_NOT_FOUND`.
 
 ## The queue
 

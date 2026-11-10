@@ -55,7 +55,7 @@ test("a move cherry-picks a merge commit with its first parent, and a squash com
     assert.match(patches, /`git cherry-pick <commit>`/);
 });
 
-test("a move restarts the server only after npm ci ends and the imports resolve", () => {
+test("a move restarts the server only after npm ci ends and the runtime dependencies are installed", () => {
     const move = patches.slice(
         patches.indexOf("## Move to a new upstream release"),
         patches.indexOf("## The queue"),
