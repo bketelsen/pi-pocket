@@ -1,6 +1,6 @@
 // The fork's patch queue (`BK-PATCHES.md`): each row names the fork PR whose merged commit moves, a merge commit moves
-// with `-m 1`, the tag form has one `v`, and the publish triggers it names are the ones `publish.yml` has. Fork only: it
-// moves with the queue.
+// with `-m 1`, the tag form has one `v`, a move restarts the server only after `npm ci` ends, and the publish triggers
+// it names are the ones `publish.yml` has. Fork only: it moves with the queue.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -53,6 +53,18 @@ test("a move cherry-picks a merge commit with its first parent, and a squash com
     assert.match(patches, /`git cherry-pick -m 1 <merge commit>`/);
     assert.match(patches, /parent 1 is the `bk\/` branch/);
     assert.match(patches, /`git cherry-pick <commit>`/);
+});
+
+test("a move restarts the server only after npm ci ends and the runtime dependencies are installed", () => {
+    const move = patches.slice(
+        patches.indexOf("## Move to a new upstream release"),
+        patches.indexOf("## The queue"),
+    );
+
+    assert.match(move, /Before the server restarts on the new fork tag/);
+    assert.match(move, /run `npm ci` and wait until it ends/);
+    assert.match(move, /`npm ls --omit=dev`/);
+    assert.match(move, /`ERR_MODULE_NOT_FOUND`/);
 });
 
 test("the publish triggers named are the ones publish.yml has", () => {
